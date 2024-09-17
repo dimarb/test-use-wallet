@@ -2,27 +2,11 @@ import  algosdk  from 'algosdk'
 
 const appId = 722209123
 const method = {
-  "name": "reigsterCandidate",
+  "name": "vote",
   "args": [
     {
-      "name": "address",
+      "name": "candidate",
       "type": "address"
-    },
-    {
-      "name": "fistName",
-      "type": "string"
-    },
-    {
-      "name": "lastName",
-      "type": "string"
-    },
-    {
-      "name": "email",
-      "type": "string"
-    },
-    {
-      "name": "phone",
-      "type": "string"
     }
   ],
   "returns": {
@@ -30,18 +14,22 @@ const method = {
   }
 }
 
-export async function SendCandidate(methodArgs, algodClient, activeAddress, transactionSigner) {
-  // const { algodClient, activeAddress, transactionSigner } = useWallet()
-  console.log('Avanzó ss --s', methodArgs)
+export async function SendVote(addressCandidate, algodClient, activeAddress, transactionSigner) {
+  console.log('Avanzó ss --s', addressCandidate)
+  if (!addressCandidate) {
+    console.error('Candidate address is required');
+    return;
+  }
+  const methodArgs = [addressCandidate]; 
+  console.log('Votación iniciada con argumentos:', methodArgs);
 
 
     const atc = new algosdk.AtomicTransactionComposer()
     const suggestedParams = await algodClient.getTransactionParams().do()
-    //const boxKey = new Uint8Array( Buffer.from( methodArgs[0], 'utf8'));
     const address = algosdk.decodeAddress(methodArgs[0]).publicKey;
     const boxRef = { appIndex: 0, name: address };
     const boxes = [ boxRef ];
-    console.log('Avanzó---<', appId)
+    console.log('Avanzó')
     
 
     atc.addMethodCall({
@@ -54,7 +42,7 @@ export async function SendCandidate(methodArgs, algodClient, activeAddress, tran
       appID : Number(appId),
     });
     const result = await atc.execute(algodClient, 3);
-    console.log(result);
+    console.log('Resultado del voto:', result);
     return result;
 
 }

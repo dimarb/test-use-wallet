@@ -17,7 +17,7 @@ const RegisterCandidate = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
-  const handleCandidateLogin = async () => {//! Tengo error acá, me pide loguear 2 veces
+  const handleCandidateLogin = async () => {
     if (wallets.length === 0) {
       alert('No hay billeteras disponibles');
       return;
@@ -25,9 +25,11 @@ const RegisterCandidate = () => {
 
     try {
       const result = await wallets[0].connect(); // Intentar conectar la primera billetera disponible
-      if (activeAccount  && result) {
-        setCandidateAddress(activeAccount.address); // Guardar la dirección del candidato
+      console.log('activeAccount', activeAccount, 'result', result[0].address)
+      if (result[0].address) {
+        setCandidateAddress(result[0].address); // Guardar la dirección del candidato
         setIsCandidateLoggedIn(true);
+        console.log('Account Candidate', candidateAddress);
         alert('Inicio de sesión de candidato exitoso');
       }
     } catch (error) {
@@ -36,7 +38,7 @@ const RegisterCandidate = () => {
     }
   };
 
-  const handleAdminLogin = async () => {//! Tengo error acá, me pide loguear 2 veces
+  const handleAdminLogin = async () => {
     if (wallets.length === 0) {
       alert('No hay billeteras disponibles');
       return;
@@ -44,8 +46,9 @@ const RegisterCandidate = () => {
 
     try {
       const result = await wallets[0].connect(); // Intentar conectar la primera billetera disponible
-      if (activeAccount && result) {
-        setAdminAddress(activeAccount.address); // Guardar la dirección del administrador
+      if (result) {
+        setAdminAddress(result[0].address); // Guardar la dirección del administrador
+        console.log('Account Admin', adminAddress);
         setIsAdminLoggedIn(true);
         alert('Inicio de sesión de administrador exitoso');
       }
@@ -81,19 +84,19 @@ const RegisterCandidate = () => {
   };
 
   const handleRegister = async () => {
-    // if (!candidateName || !accountAddress || !peraWallet) {
-    //   alert('Please fill in all fields and connect your wallet.');
-    //   return;
-    // }
-    // const validationErrors = validateForm();
-    // if (Object.keys(validationErrors).length > 0) {
-    //   setErrors(validationErrors);
-    //   return;
-    // }
-    // if (!firstName || !lastName || !email || !phone ) {
-    //   alert('Revise los datos');
-    //   return;
-    // }
+    if (!firstName || !candidateAddress ) {
+      alert('Please fill in all fields and connect your wallet.');
+      return;
+    }
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    if (!firstName || !lastName || !email || !phone ) {
+      alert('Revise los datos');
+      return;
+    }
     try {
       // Asegúrate de que la billetera esté conectada
       const candidateData = [candidateAddress,
@@ -101,9 +104,8 @@ const RegisterCandidate = () => {
         lastName,
         email,
         phone]
-        console.log('candidateData', candidateData, 'a mano', ['MQVVFJTI22UXAZFBZR6MOMKPGAB7HR3A6NC6MCWSB5KK6KF6Q7MQINLDMY', 'Juan', 'Perez', 're@gmai.com', '3216549870'])
 
-      const result = await SendCandidate(candidateData,algodClient, activeAddress, transactionSigner);
+      const result = await SendCandidate(candidateData, algodClient, activeAddress, transactionSigner);
       console.log(result);
       if (result) {
         alert(`Candidate ${firstName} ${lastName} registered successfully!`);
@@ -142,7 +144,7 @@ const RegisterCandidate = () => {
       <h2>Registro</h2>
       {!isCandidateLoggedIn && !isAdminLoggedIn ? (
         <>
-          <button onClick={handleCandidateLogin}>Iniciar sesión como Candidato</button>
+          <button onClick={()=>handleCandidateLogin()}>Iniciar sesión como Candidato </button>
           
         </>
       ) : (
@@ -154,7 +156,8 @@ const RegisterCandidate = () => {
           
           }
           {isAdminLoggedIn && <p>Conectado como administrador con la cuenta: {adminAddress}</p>}
-          {isAdminLoggedIn &&           <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+          {isAdminLoggedIn &&           
+          <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
             <input
               type="text"
               placeholder="First Name"
