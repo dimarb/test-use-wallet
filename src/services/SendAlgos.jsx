@@ -35,7 +35,7 @@ function SendAlgos() {
   const { algodClient, activeAddress, transactionSigner } = useWallet()
 
   const sendAlgos = async () => {
-    const methodArgs = ["XU3ZVMTCP2J4SWXTV5U5RE4DKDABY3M2RH7BGXN7U26NLTIRAKUYIWIETQ", "Pepe", "Gome", "test@some.com", "123456"];
+    const methodArgs = ["YSWZNDMMOSIS24AIZUWRF4E2ANNPLGM3FNLH65ZVWFKBX3UGGB6SSEDTZM", "Pepe", "Gome", "test@some.com", "123456"];
     const atc = new algosdk.AtomicTransactionComposer()
     const suggestedParams = await algodClient.getTransactionParams().do()
     //const boxKey = new Uint8Array( Buffer.from( methodArgs[0], 'utf8'));
